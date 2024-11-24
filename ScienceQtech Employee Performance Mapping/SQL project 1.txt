@@ -1,0 +1,69 @@
+create database employee;
+select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT from employee.emp_record_table;
+select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT, EMP_RATING from employee.emp_record_table where (exp < 2);
+select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT, EMP_RATING from employee.emp_record_table where (exp > 4);
+select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT, EMP_RATING from employee.emp_record_table where (2 < exp < 4);
+select concat(first_name, ' ' ,last_name) as name from employee.emp_record_table where dept = 'finance';
+select concat(first_name, ' ' ,last_name) as name from employee.data_science_team where dept = 'finance';
+select * from employee.emp_record_table where DEPT = 'healthcare' union select * from employee.emp_record_table where DEPT = 'finance';
+SELECT manager_id , count(*) as num_reporter
+from employee.emp_record_table
+GROUP BY MANAGER_ID;
+select count(emp_id),dept , max(emp_rating)
+from employee.emp_record_table
+group by dept
+order by max(EMP_RATING);
+select DEPT, EMP_ID, FIRST_NAME, LAST_NAME, ROLE, 
+EMP_RATING, MAX(EMP_RATING) over(partition by dept)
+from employee.emp_record_table;
+select role , max(salary) , min(salary) from employee.emp_record_table 
+group by role;
+select emp_id , exp , rank () over (order by exp desc )
+from employee.emp_record_table ;
+
+create view salary as
+(select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT, EMP_RATING , country , salary
+from employee.emp_record_table
+where salary > 6000);
+
+select * from salary;
+
+select *
+from (select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT, EMP_RATING , country , salary
+from employee.emp_record_table
+where exp > 10 ) as emp_1;
+
+create procedure experience()
+(select EMP_ID, FIRST_NAME, LAST_NAME, GENDER, DEPT, EMP_RATING , country , salary
+from employee.emp_record_table
+where exp > 3);
+
+delimiter //
+create function organisation_requirement(exp int) returns varchar(100)
+deterministic
+begin
+declare output varchar(100);
+if exp <= 2
+then set output =  "junior data scientist";
+elseif  exp > 2 and exp < 5
+then set output =  "associate data scientist";
+elseif  exp > 5 and exp < 10
+then set output =  "senior data scientist";
+elseif  exp > 10 and exp < 12
+then set output =  "lead data scientist";
+elseif  exp > 12 and exp < 16
+then set output =  "manager";
+end if ;
+return output ;
+end //
+delimiter ;
+
+create index optimization on employee.emp_record_table(first_name(50));
+select emp_id , first_name , last_name from employee.emp_record_table 
+where first_name = 'eric';
+
+select EMP_ID, FIRST_NAME, LAST_NAME, emp_rating , salary, ((salary * 0.05) * emp_rating) as bonus from employee.emp_record_table;
+
+select continent , country , avg(salary) from employee.emp_record_table
+group by continent , country 
+order by continent , country; 
